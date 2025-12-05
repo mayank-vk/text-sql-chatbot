@@ -1,0 +1,30 @@
+flask
+python-dotenv
+pymysql
+
+# LangChain Core + Community
+langchain
+langchain-core
+langchain-community
+
+# LangChain LLM integrations
+langchain-google-genai
+langchain-groq
+langchain-openai
+
+# LLM evaluation tools
+ragas
+datasets
+evaluate
+
+# Embeddings
+sentence-transformers
+langchain-huggingface
+
+# Jupyter (optional but useful for notebook)
+jupyter
+ipykernel
+
+# Other utilities
+numpy
+pandas

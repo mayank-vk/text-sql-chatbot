@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text-to-SQL Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #020617;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid #1f2937;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+            color: #38bdf8;
+        }
+        .subtitle {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            padding: 10px 12px;
+            font-size: 14px;
+            resize: vertical;
+            background: #020617;
+            color: #e5e7eb;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            color: #0b1120;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #020617;
+            border: 1px solid #1f2937;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #e5e7eb;
+        }
+        .code-block {
+            font-family: "Consolas", "Fira Code", monospace;
+            font-size: 13px;
+            background: #020617;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #1f2937;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th {
+            background: #020617;
+            color: #e5e7eb;
+        }
+        tr:nth-child(even) {
+            background: #020617;
+        }
+        .error {
+            color: #fecaca;
+            font-size: 13px;
+        }
+        .pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #1f2937;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Text-to-SQL Assistant</h1>
+    <div class="subtitle">
+        Ask questions in natural language. The assistant will generate SQL, run it on the database, and show the results.
+    </div>
+
+    <form method="POST">
+        <label for="question" style="font-size: 14px;">Your question</label>
+        <textarea id="question" name="question" placeholder="e.g., What is the total 'Line Total' for Geiss company?">{{ question or "" }}</textarea>
+        <br>
+        <button type="submit">Run Query</button>
+    </form>
+
+    {% if question %}
+    <div class="section">
+        <div class="section-title">
+            Question
+            <span class="pill">User input</span>
+        </div>
+        <div>{{ question }}</div>
+    </div>
+    {% endif %}
+
+    {% if sql_query %}
+    <div class="section">
+        <div class="section-title">
+            Generated SQL
+            <span class="pill">LLM output</span>
+        </div>
+        <div class="code-block">{{ sql_query }}</div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="section">
+        <div class="section-title">
+            Error
+            <span class="pill">Execution</span>
+        </div>
+        <div class="error">{{ error }}</div>
+    </div>
+    {% endif %}
+
+    {% if rows and columns %}
+    <div class="section">
+        <div class="section-title">
+            Query Results
+            <span class="pill">Database</span>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% elif sql_query and not error %}
+    <div class="section">
+        <div class="section-title">
+            Query Results
+        </div>
+        <div>No rows returned.</div>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
