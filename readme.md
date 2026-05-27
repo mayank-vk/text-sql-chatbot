@@ -1,186 +1,105 @@
-🚀 Text-to-SQL LLM Assistant
+# Text-to-SQL LLM Assistant
 
-Natural Language → SQL Query → Executed Results
-Built using LangChain, Gemini Flash, MySQL, Flask, and RAGAS.
+Natural language -> SQL query -> executed database results.
 
-📌 Overview
+Built with Python, Flask, LangChain, Gemini Flash, MySQL, RAGAS, Groq, and HuggingFace embeddings.
 
-This project is an AI-powered Text-to-SQL Assistant that converts natural language questions into SQL queries using an LLM. The generated SQL is then executed on a live MySQL database, and the results are displayed through a clean Flask web interface.
+## Overview
 
-It also includes a Jupyter Notebook demonstrating RAGAS-based evaluation of SQL query quality (Context Precision, Faithfulness, and Helpfulness).
+This project is an AI-powered Text-to-SQL Assistant that converts natural language questions into SQL queries using an LLM. The generated SQL is validated as a single SELECT-only statement, executed against a live MySQL database, and displayed through a Flask web interface.
 
-✨ Features
-🔹 1. LLM-generated SQL Queries
+The notebook under `notebooks/` contains RAGAS-based evaluation experiments for SQL output quality, including context precision and helpfulness-style rubric scoring.
 
-Converts natural language questions into valid MySQL SELECT statements
+## Features
 
-Uses Gemini 2.0 Flash via LangChain
+- Generates MySQL SELECT queries from natural language questions.
+- Injects the live database schema into the LangChain prompt.
+- Uses Gemini Flash through `langchain-google-genai`.
+- Executes validated read-only SQL against MySQL through PyMySQL.
+- Blocks non-SELECT statements, multiple statements, and unsafe SQL keywords before execution.
+- Provides a lightweight Flask UI showing the question, generated SQL, results, and errors.
+- Includes a RAGAS evaluation notebook using Groq and HuggingFace embeddings.
 
-Full schema-aware generation using dynamic prompt injection
+## Project Structure
 
-Safety-checked to prevent UPDATE/DELETE/DROP/etc.
+```text
+text-sql/
+|-- app.py
+|-- text_to_sql_core.py
+|-- requirements.txt
+|-- requirements-eval.txt
+|-- .env.example
+|-- templates/
+|   `-- index.html
+`-- notebooks/
+    `-- text-to-sql.ipynb
+```
 
-🔹 2. SQL Execution Engine
+## Setup
 
-Executes generated SQL directly on a MySQL database
+1. Create and activate a virtual environment.
 
-Returns:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
 
-Column names
+2. Install app dependencies.
 
-Data rows
+```bash
+pip install -r requirements.txt
+```
 
-Query execution errors (if any)
+For the optional RAGAS notebook, install the evaluation stack separately. This is much larger because it includes HuggingFace and notebook dependencies.
 
-🔹 3. Flask Web Interface
+```bash
+pip install -r requirements-eval.txt
+```
 
-Clean UI to enter questions
+3. Create a local `.env` file from the example.
 
-Shows:
+```bash
+copy .env.example .env
+```
 
-Generated SQL
+4. Fill in your local API key and MySQL settings in `.env`.
 
-Execution results
-
-Error messages
-
-Easy to deploy locally or on AWS EC2
-
-🔹 4. RAGAS Evaluation Notebook
-
-Included under /notebooks:
-
-Evaluates SQL generation quality using:
-
-Context Precision
-
-Faithfulness
-
-Helpfulness Score (Rubrics)
-
-Uses Groq + HuggingFace embeddings
-
-Helps measure model performance on SQL tasks
-
-📂 Project Structure
-text_to_sql_project/
-│
-├── app.py                   # Flask web server
-├── text_to_sql_core.py      # LLM → SQL logic + schema injection
-├── requirements.txt         
-├── .gitignore
-├── .env                     # (Not committed - contains API keys)
-│
-├── templates/
-│   └── index.html           # Frontend UI
-│
-└── notebooks/
-    └── evaluation_ragas.ipynb   # RAGAS evaluation & experiments
-
-🛠️ Tech Stack
-
-Languages & Frameworks
-
-Python
-
-Flask
-
-LangChain
-
-LLMs
-
-Gemini 2.0 Flash
-
-Groq llama-3.1-8b-instant (for evaluation)
-
-Database
-
-MySQL (via PyMySQL)
-
-Evaluation
-
-RAGAS
-
-HuggingFace Embeddings
-
-LangChain LLM wrappers
-
-⚙️ Setup Instructions
-1️⃣ Clone the repository
-git clone https://github.com/mayank-vk/text-to-sql-project.git
-cd text-to-sql-project
-
-2️⃣ Create .env file
-GEMINI_API_KEY=your_key_here
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
 MYSQL_USER=root
-MYSQL_PASSWORD=your_password
+MYSQL_PASSWORD=your_mysql_password_here
 MYSQL_DB=text_to_sql
+```
 
-3️⃣ Install dependencies
-pip install -r requirements.txt
+5. Run the Flask app.
 
-4️⃣ Run the Flask app
+```bash
 python app.py
+```
 
+Open `http://127.0.0.1:5000`.
 
-Open your browser:
+## How It Works
 
-http://127.0.0.1:5000
+1. The user enters a natural language question.
+2. LangChain fetches the current MySQL schema.
+3. Gemini Flash generates a single SQL query from the prompt.
+4. The backend cleans and validates the query.
+5. Only a single SELECT statement is allowed to execute.
+6. Flask renders the generated SQL and query results.
 
-🧠 How It Works (Architecture)
+## Evaluation
 
-User enters question
+The notebook demonstrates a RAGAS workflow for benchmarking SQL-generation quality with Groq-hosted LLMs and HuggingFace embeddings. Example metrics include context precision and helpfulness-style rubric scores.
 
-Schema fetched dynamically from MySQL
+## Safety Notes
 
-Gemini LLM generates SQL using prompt template
+- Keep `.env` local. It is ignored by Git and should never be committed.
+- The app validates generated SQL before execution, but it should still be used with a least-privilege MySQL user that has read-only permissions.
+- Avoid using a production database for demos or experiments.
 
-SQL sanitized → must start with SELECT
+## Resume Summary
 
-SQL executed on MySQL using PyMySQL
-
-Results displayed in browser
-
-Evaluation notebook measures model quality with RAGAS
-
-📊 Evaluation Example (RAGAS)
-
-The notebook includes experiments measuring:
-
-Context Precision
-
-Helpfulness Score
-
-Faithfulness
-
-Sample output:
-
-{
-   "context_precision": 0.25,
-   "helpfulness": 3.25
-}
-
-🎯 Future Enhancements
-
-(optional section)
-
-Add conversational memory
-
-Add SQL query explanation using LLM
-
-Support multiple databases (PostgreSQL, SQLite)
-
-Add query caching for speed
-
-Add chart visualizations (matplotlib)
-
-📝 License
-
-MIT License.
-
-🙋 Author
-
-Mayank v k
-AI/ML Engineer | NLP | GenAI 
+Built an end-to-end GenAI Text-to-SQL system using Flask, LangChain, Gemini Flash, and MySQL, with schema-aware prompt engineering, SELECT-only backend validation, live query execution, and a RAGAS evaluation pipeline using Groq and HuggingFace embeddings.

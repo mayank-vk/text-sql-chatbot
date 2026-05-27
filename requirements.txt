@@ -1,30 +1,12 @@
-flask
-python-dotenv
-pymysql
+Flask>=3.0
+python-dotenv>=1.0
+PyMySQL>=1.1
+SQLAlchemy>=2.0
 
 # LangChain Core + Community
-langchain
-langchain-core
-langchain-community
+langchain>=0.3
+langchain-core>=0.3
+langchain-community>=0.3
 
-# LangChain LLM integrations
-langchain-google-genai
-langchain-groq
-langchain-openai
-
-# LLM evaluation tools
-ragas
-datasets
-evaluate
-
-# Embeddings
-sentence-transformers
-langchain-huggingface
-
-# Jupyter (optional but useful for notebook)
-jupyter
-ipykernel
-
-# Other utilities
-numpy
-pandas
+# Gemini integration for the Flask app
+langchain-google-genai>=2.0

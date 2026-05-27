@@ -13,6 +13,7 @@ __pycache__/
 # Ignore virtual environment directories
 venv/
 env/
+.venv/
 
 # Ignore local databases
 *.db
